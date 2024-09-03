@@ -23,15 +23,16 @@ with total as (
     select sum(tot_amt) as total_amt
     from tb_statistic
 )
-select a.seg,
-       sum(a.tot_amt) as tot_amt,
+select seg,
+       sum(tot_amt) as tot_amt,
        -- 100 대신 100.0을 사용하는 이유는 정수 연산과 소수점 연산의 차이 때문
        -- SQL에서는 연산에 사용되는 숫자의 타입에 따라 결과가 달라질 수 있음
        -- 100.0을 사용하면 SQL은 나머지 계산이 부동 소수점 연산으로 처리될 것임을 보장
-       ROUND((sum(a.tot_amt) / total.total_amt) * 100, 2) as ratio
-from tb_statistic a, total
-group by a.seg
-order by a.seg;
+       ROUND((sum(tot_amt) / total.total_amt) * 100.0, 2) as ratio
+from tb_statistic
+join total
+group by seg
+order by seg;
 
 /**
  크로스 조인은 두 테이블 간의 모든 가능한 조합(카티션 곱)을 생성합니다.
