@@ -1,6 +1,6 @@
 그룹별 판매량, 비율 구하기
 
-// 그룹별 판매량과 비율 구하기
+-- 그룹별 판매량과 비율 구하기
 create table tb_statistic (
     id bigint auto_increment primary key ,
     seg varchar(255),
@@ -18,13 +18,16 @@ insert into tb_statistic(seg) values('4_NULL');
 select *
 from tb_statistic;
 
-// 이렇게 짜는게 가독성도 좋고 명확하고 유지보수가 좋아보임
+-- 이렇게 짜는게 가독성도 좋고 명확하고 유지보수가 좋아보임
 with total as (
     select sum(tot_amt) as total_amt
     from tb_statistic
 )
 select a.seg,
        sum(a.tot_amt) as tot_amt,
+       -- 100 대신 100.0을 사용하는 이유는 정수 연산과 소수점 연산의 차이 때문
+       -- SQL에서는 연산에 사용되는 숫자의 타입에 따라 결과가 달라질 수 있음
+       -- 100.0을 사용하면 SQL은 나머지 계산이 부동 소수점 연산으로 처리될 것임을 보장
        ROUND((sum(a.tot_amt) / total.total_amt) * 100, 2) as ratio
 from tb_statistic a, total
 group by a.seg
@@ -42,6 +45,6 @@ SELECT
     SUM(tot_amt) AS total_sales,
     SUM(tot_amt) * 100.0 / total_amt AS sales_percentage
 FROM  tb_statistic m
-// 서브쿼리가 단일 행을 반환하는 경우, 실질적으로 각 행에 서브쿼리의 결과가 결합됩니다.
+-- 서브쿼리가 단일 행을 반환하는 경우, 실질적으로 각 행에 서브쿼리의 결과가 결합됩니다.
 CROSS JOIN (SELECT SUM(tot_amt) total_amt FROM tb_statistic) total
 GROUP BY seg;
